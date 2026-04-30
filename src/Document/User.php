@@ -48,13 +48,24 @@ class User
     #[ODM\PrePersist]
     public function prePersist(): void
     {
-        $this->id = Uuid::v7()->toRfc4122();
-        $this->createdAt = new \DateTimeImmutable();
+        if (!isset($this->id) || $this->id === '') {
+            $this->id = Uuid::v7()->toRfc4122();
+        }
+
+        $currentDateTime = new \DateTimeImmutable();
+        $this->createdAt = $currentDateTime;
+        $this->updatedAt = $currentDateTime;
     }
 
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function setId(string $id): self
+    {
+        $this->id = $id;
+        return $this;
     }
 
     public function getFirstName(): string
