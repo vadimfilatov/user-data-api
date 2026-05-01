@@ -31,8 +31,8 @@ final readonly class IpLocaleService
             $countryName = $this->extractString($data['country'] ?? null);
 
             return new CountryInfoDto($countryCode, $countryName);
-        } catch (\Throwable) {
-            $this->logger->warning("Cannot get country info");
+        } catch (\Throwable $exception) {
+            $this->logger->warning('Cannot get country info', ['exception' => $exception]);
 
             return new CountryInfoDto(null, null);
         }

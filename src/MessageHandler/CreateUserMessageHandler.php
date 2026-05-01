@@ -8,6 +8,8 @@ use App\Document\User;
 use App\Message\CreateUserMessage;
 use App\Service\User\UserIdentityHashGenerator;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use MongoDB\Driver\Exception\BulkWriteException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -16,6 +18,7 @@ final readonly class CreateUserMessageHandler
     public function __construct(
         private DocumentManager $documentManager,
         private UserIdentityHashGenerator $userIdentityHashGenerator,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -36,6 +39,23 @@ final readonly class CreateUserMessageHandler
         ));
 
         $this->documentManager->persist($user);
-        $this->documentManager->flush();
+
+        try {
+            $this->documentManager->flush();
+        } catch (BulkWriteException $exception) {
+            foreach ($exception->getWriteResult()->getWriteErrors() as $error) {
+                if ($error->getCode() === 11000) {
+                    $this->logger->error(
+                        "Cannot create user " . $user->getFirstName() . " " . $user->getLastName() . " because this user is exists",
+                        ['exception' => $exception]
+                    );
+                }
+            }
+        } catch (\Throwable $exception) {
+            $this->logger->error(
+                "Cannot create user " . $user->getFirstName() . " " . $user->getLastName(),
+                ['exception' => $exception],
+            );
+        }
     }
 }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Document;
 
+use App\Util\UuidGenerator;
 use Doctrine\ODM\MongoDB\Mapping\Attribute as ODM;
 use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Uid\Uuid;
 
 #[ODM\Document(collection: 'users')]
 #[ODM\HasLifecycleCallbacks]
@@ -54,7 +54,7 @@ class User
     public function prePersist(): void
     {
         if (!isset($this->id) || $this->id === '') {
-            $this->id = Uuid::v7()->toRfc4122();
+            $this->id = UuidGenerator::v7();
         }
 
         $currentDateTime = new \DateTimeImmutable();

@@ -21,6 +21,7 @@ final class UserControllerTest extends WebTestCase
     public function testCreateUserReturnsAcceptedAndDispatchesMessage(): void
     {
         $client = static::createClient();
+        $phoneNumber = '+38097'.random_int(1000000, 9999999);
 
         $logger = $this->createStub(LoggerInterface::class);
         $ipLocaleService = new IpLocaleService(
@@ -33,11 +34,11 @@ final class UserControllerTest extends WebTestCase
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())
             ->method('dispatch')
-            ->with($this->callback(function (mixed $message): bool {
+            ->with($this->callback(function (mixed $message) use ($phoneNumber): bool {
                 return $message instanceof CreateUserMessage
                     && $message->firstName === 'John'
                     && $message->lastName === 'Doe'
-                    && $message->phoneNumbers === ['+380971234567']
+                    && $message->phoneNumbers === [$phoneNumber]
                     && $message->requestIp === '8.8.8.8'
                     && $message->countryCode === 'US'
                     && $message->countryName === 'United States';
@@ -55,7 +56,7 @@ final class UserControllerTest extends WebTestCase
             content: json_encode([
                 'firstName' => 'John',
                 'lastName' => 'Doe',
-                'phoneNumbers' => ['+380971234567'],
+                'phoneNumbers' => [$phoneNumber],
             ], JSON_THROW_ON_ERROR),
         );
 

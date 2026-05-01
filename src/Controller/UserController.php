@@ -12,6 +12,7 @@ use App\Service\Geo\IpLocaleService;
 use App\Service\Ip\ClientIpService;
 use App\Service\User\UserDuplicateChecker;
 use App\Service\User\UserListService;
+use App\Util\UuidGenerator;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,7 +23,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Uid\Uuid;
 
 #[Route('/api/users')]
 final class UserController extends AbstractController
@@ -161,7 +161,7 @@ final class UserController extends AbstractController
             return new JsonResponse(['message' => 'User with same data already exists'], Response::HTTP_CONFLICT);
         }
 
-        $id = Uuid::v7()->toRfc4122();
+        $id = UuidGenerator::v7();
         $requestIp = $clientIpService->getClientIp($request);
         $countryInfo = $ipLocaleService->getCountryInfo($requestIp);
 

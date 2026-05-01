@@ -10,6 +10,7 @@ use App\MessageHandler\CreateUserMessageHandler;
 use App\Service\User\UserIdentityHashGenerator;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 final class CreateUserMessageHandlerTest extends TestCase
 {
@@ -53,7 +54,9 @@ final class CreateUserMessageHandlerTest extends TestCase
 
         $documentManager->expects($this->once())->method('flush');
 
-        $handler = new CreateUserMessageHandler($documentManager, $identityHashGenerator);
+        $logger = $this->createStub(LoggerInterface::class);
+
+        $handler = new CreateUserMessageHandler($documentManager, $identityHashGenerator, $logger);
         $handler($message);
     }
 }
