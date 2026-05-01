@@ -63,7 +63,7 @@ final class UserControllerTest extends WebTestCase
 
         $payload = json_decode((string) $client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertSame('User created', $payload['message']);
+        self::assertSame('User accepted', $payload['message']);
         self::assertMatchesRegularExpression('/^[0-9a-fA-F-]{36}$/', $payload['id']);
     }
 

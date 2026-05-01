@@ -82,7 +82,7 @@ class User
 
     public function setFirstName(string $firstName): self
     {
-        $this->firstName = $firstName;
+        $this->firstName = trim($firstName);
         return $this;
     }
 
@@ -94,7 +94,7 @@ class User
 
     public function setLastName(string $lastName): self
     {
-        $this->lastName = $lastName;
+        $this->lastName = trim($lastName);
         return $this;
     }
 
