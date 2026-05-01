@@ -12,6 +12,8 @@ final readonly class CreateUserMessage
         public string $lastName,
         public array $phoneNumbers,
         public string $requestIp,
+        public string $countryCode,
+        public string $countryName,
     ) {
     }
 }

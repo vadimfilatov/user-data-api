@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Attribute as ODM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ODM\Document(collection: 'users')]
@@ -57,6 +58,7 @@ class User
         $this->updatedAt = $currentDateTime;
     }
 
+    #[Groups(['user:list'])]
     public function getId(): string
     {
         return $this->id;
@@ -68,6 +70,7 @@ class User
         return $this;
     }
 
+    #[Groups(['user:list'])]
     public function getFirstName(): string
     {
         return $this->firstName;
@@ -79,6 +82,7 @@ class User
         return $this;
     }
 
+    #[Groups(['user:list'])]
     public function getLastName(): string
     {
         return $this->lastName;
@@ -90,6 +94,7 @@ class User
         return $this;
     }
 
+    #[Groups(['user:list'])]
     public function getPhoneNumbers(): array
     {
         return $this->phoneNumbers;
@@ -132,5 +137,15 @@ class User
     {
         $this->countryName = $countryName;
         return $this;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
     }
 }

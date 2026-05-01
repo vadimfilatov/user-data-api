@@ -6,7 +6,6 @@ namespace App\MessageHandler;
 
 use App\Document\User;
 use App\Message\CreateUserMessage;
-use App\Service\Geo\IpLocaleService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -14,8 +13,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class CreateUserMessageHandler
 {
     public function __construct(
-        private DocumentManager $documentManager,
-        private IpLocaleService $ipCountryLookupService,
+        private DocumentManager $documentManager
     ) {
     }
 
@@ -27,10 +25,8 @@ final readonly class CreateUserMessageHandler
         $user->setLastName($message->lastName);
         $user->setPhoneNumbers($message->phoneNumbers);
         $user->setRequestIp($message->requestIp);
-
-        $countryInfo = $this->ipCountryLookupService->getCountryInfo($message->requestIp);
-        $user->setCountryCode($countryInfo->countryCode);
-        $user->setCountryName($countryInfo->countryName);
+        $user->setCountryCode($message->countryCode);
+        $user->setCountryName($message->countryName);
 
         $this->documentManager->persist($user);
         $this->documentManager->flush();
