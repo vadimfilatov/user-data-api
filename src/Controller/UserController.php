@@ -9,13 +9,14 @@ use App\Dto\UserListRequestDto;
 use App\Message\CreateUserMessage;
 use App\Service\Geo\IpLocaleService;
 use App\Service\Ip\ClientIpService;
+use App\Service\User\UserDuplicateChecker;
 use App\Service\User\UserListService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Uid\Uuid;
@@ -36,11 +37,16 @@ final class UserController extends AbstractController
     public function create(
         Request $request,
         #[MapRequestPayload] CreateUserRequestDto $createUserRequestDto,
+        UserDuplicateChecker $userDuplicateChecker,
         ClientIpService $clientIpService,
         IpLocaleService $ipLocaleService,
         MessageBusInterface $messageBus,
     ): JsonResponse
     {
+        if ($userDuplicateChecker->isDuplicate($createUserRequestDto->firstName, $createUserRequestDto->lastName, $createUserRequestDto->phoneNumbers)) {
+            return new JsonResponse(['message' => 'User with same data already exists'], Response::HTTP_CONFLICT);
+        }
+
         $id = Uuid::v7()->toRfc4122();
         $requestIp = $clientIpService->getClientIp($request);
         $countryInfo = $ipLocaleService->getCountryInfo($requestIp);
@@ -57,7 +63,7 @@ final class UserController extends AbstractController
 
         return new JsonResponse(
             [
-                'message' => 'User created',
+                'message' => 'User accepted',
                 'id' => $id,
             ],
             Response::HTTP_ACCEPTED,

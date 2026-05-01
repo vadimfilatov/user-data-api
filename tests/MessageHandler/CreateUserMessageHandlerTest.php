@@ -7,6 +7,7 @@ namespace App\Tests\MessageHandler;
 use App\Document\User;
 use App\Message\CreateUserMessage;
 use App\MessageHandler\CreateUserMessageHandler;
+use App\Service\User\UserIdentityHashGenerator;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPUnit\Framework\TestCase;
 
@@ -25,11 +26,17 @@ final class CreateUserMessageHandlerTest extends TestCase
         );
 
         $documentManager = $this->createMock(DocumentManager::class);
+        $identityHashGenerator = new UserIdentityHashGenerator();
+        $expectedIdentityHash = $identityHashGenerator->generate(
+            $message->firstName,
+            $message->lastName,
+            $message->phoneNumbers,
+        );
 
         $documentManager
             ->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function (mixed $document) use ($message): bool {
+            ->with($this->callback(function (mixed $document) use ($message, $expectedIdentityHash): bool {
                 if (!$document instanceof User) {
                     return false;
                 }
@@ -40,12 +47,13 @@ final class CreateUserMessageHandlerTest extends TestCase
                     && $document->getPhoneNumbers() === $message->phoneNumbers
                     && $document->getRequestIp() === $message->requestIp
                     && $document->getCountryCode() === $message->countryCode
-                    && $document->getCountryName() === $message->countryName;
+                        && $document->getCountryName() === $message->countryName
+                        && $document->getIdentityHash() === $expectedIdentityHash;
             }));
 
         $documentManager->expects($this->once())->method('flush');
 
-        $handler = new CreateUserMessageHandler($documentManager);
+        $handler = new CreateUserMessageHandler($documentManager, $identityHashGenerator);
         $handler($message);
     }
 }

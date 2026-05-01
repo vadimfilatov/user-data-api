@@ -11,6 +11,7 @@ use Symfony\Component\Uid\Uuid;
 #[ODM\Document(collection: 'users')]
 #[ODM\HasLifecycleCallbacks]
 #[ODM\Index(keys: ['lastName' => 'asc'])]
+#[ODM\Index(keys: ['identityHash' => 'asc'], unique: true, sparse: true)]
 class User
 {
     #[ODM\Id(type: 'string', strategy: 'NONE')]
@@ -33,6 +34,9 @@ class User
 
     #[ODM\Field(type: 'string', nullable: true)]
     private ?string $countryName = null;
+
+    #[ODM\Field(type: 'string', nullable: true)]
+    private ?string $identityHash = null;
 
     #[ODM\Field(type: 'date_immutable')]
     private \DateTimeImmutable $createdAt;
@@ -150,5 +154,16 @@ class User
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
+    }
+
+    public function getIdentityHash(): ?string
+    {
+        return $this->identityHash;
+    }
+
+    public function setIdentityHash(?string $identityHash): self
+    {
+        $this->identityHash = $identityHash;
+        return $this;
     }
 }
