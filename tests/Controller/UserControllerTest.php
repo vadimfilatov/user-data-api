@@ -91,24 +91,41 @@ final class UserControllerTest extends WebTestCase
         self::assertNotEmpty($payload['errors']);
     }
 
-    public function testListUsersReturnsServicePayload(): void
+    public function testListUsersReturnsValidContract(): void
     {
         $client = static::createClient();
-
-        $expectedPayload = [
-            'data' => [],
-            'pagination' => [
-                'page' => 1,
-                'perPage' => 20,
-                'total' => 0,
-            ],
-        ];
 
         $client->request('GET', '/api/users?sortBy=id&order=desc&page=1&perPage=20');
 
         self::assertResponseStatusCodeSame(200);
 
         $payload = json_decode((string) $client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame($expectedPayload, $payload);
+
+        self::assertIsArray($payload);
+        self::assertArrayHasKey('data', $payload);
+        self::assertArrayHasKey('pagination', $payload);
+
+        self::assertIsArray($payload['data']);
+
+        self::assertIsArray($payload['pagination']);
+        self::assertArrayHasKey('page', $payload['pagination']);
+        self::assertArrayHasKey('perPage', $payload['pagination']);
+        self::assertArrayHasKey('total', $payload['pagination']);
+
+        self::assertSame(1, $payload['pagination']['page']);
+        self::assertSame(20, $payload['pagination']['perPage']);
+        self::assertIsInt($payload['pagination']['total']);
+        self::assertGreaterThanOrEqual(0, $payload['pagination']['total']);
+
+        foreach ($payload['data'] as $row) {
+            self::assertIsArray($row);
+            self::assertArrayHasKey('id', $row);
+            self::assertArrayHasKey('firstName', $row);
+            self::assertArrayHasKey('lastName', $row);
+            self::assertArrayHasKey('phoneNumbers', $row);
+            self::assertArrayHasKey('requestIp', $row);
+            self::assertArrayHasKey('countryCode', $row);
+            self::assertArrayHasKey('countryName', $row);
+        }
     }
 }

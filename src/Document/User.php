@@ -106,6 +106,7 @@ class User
         return $this;
     }
 
+    #[Groups(['user:list'])]
     public function getRequestIp(): string
     {
         return $this->requestIp;
@@ -117,6 +118,7 @@ class User
         return $this;
     }
 
+    #[Groups(['user:list'])]
     public function getCountryCode(): ?string
     {
         return $this->countryCode;
@@ -128,6 +130,7 @@ class User
         return $this;
     }
 
+    #[Groups(['user:list'])]
     public function getCountryName(): ?string
     {
         return $this->countryName;
