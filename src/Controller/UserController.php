@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Document\User;
 use App\Dto\CreateUserRequestDto;
 use App\Dto\UserListRequestDto;
 use App\Message\CreateUserMessage;
@@ -11,6 +12,8 @@ use App\Service\Geo\IpLocaleService;
 use App\Service\Ip\ClientIpService;
 use App\Service\User\UserDuplicateChecker;
 use App\Service\User\UserListService;
+use Nelmio\ApiDocBundle\Attribute\Model;
+use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
